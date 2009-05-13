@@ -1,0 +1,17 @@
+v. 1.18, 18 February 2008
+        -- Changed the license for compatibility with GPL. Added the file
+           LICENSE.
+v. 1.17, 19 October 2007
+   	-- Introduced this file
+	-- Corrected the advice in the help message:
+
+	   -P nppc=<value> -- set the average number of points per cell 
+	   (default = 5, increase if the point distribution is strongly
+	   non-uniform to get larger cells)
+
+	   became:
+
+	   -P nppc=<value> -- set the average number of points per cell 
+	   (default = 5, works best for uniformly distributed data. Decrease 
+           to get smaller cells or increase to get larger cells)
+
