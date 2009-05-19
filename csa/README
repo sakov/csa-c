@@ -4,7 +4,7 @@ Version 1.17
 
 `csa' is a free software. See LICENSE for details.
 
-Please send comments and bugs to Pavel.Sakov@nersc.no .
+Please send comments and bugs to Pavel.Sakov<at>gmail.com .
 
 This code has been developed and used mainly on pc-linux platform, however,
 it should compile on other platforms. Beware that the configure script 
@@ -44,9 +44,7 @@ http://www.math.uni-mannheim.de/~lsmath4/paper/VIS2001.pdf.gz
 
 *The singular value decomposition code was borrowed from EISPACK
 
-Please acknowledge the use of this software in publications, e.g.:
-"<We, this study, ...> used bivariate cubic spline interpolation code "csa"
-version <version number> written by Pavel Sakov".
+Please acknowledge the use of this software in publications.
 
 Good luck!
 Pavel Sakov
