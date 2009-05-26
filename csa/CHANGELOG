@@ -1,3 +1,5 @@
+v. 1.20, 26 May 2009
+        -- Bug fix in csa_approximatepoints2().
 v. 1.19, 25 May 2009
         -- Added  csa_approximatepoints2() by request of Rob Hetland.
 v. 1.18, 18 February 2009

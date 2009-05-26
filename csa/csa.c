@@ -1324,6 +1324,9 @@ void csa_approximatepoint(csa* a, point* p)
     int ti;
     double bc[3];
 
+    if (a->squares == NULL)
+	quit("csa_approximatepoint(): csa_calculatespline() had to be called\n");
+
     if (fabs(rint(ii) - ii) / h < EPS)
         ii = rint(ii);
     if (fabs(rint(jj) - jj) / h < EPS)
@@ -1467,6 +1470,11 @@ double* csa_approximatepoints2(int nin, double xin[], double yin[], double zin[]
     csa_addpoints(a, nin, pin);
     if (sigma != NULL)
 	csa_addstd(a, nin, sigma);
+
+    /*
+     * calculate spline
+     */
+    csa_calculatespline(a);
 
     /*
      * read ioutput data into point array
