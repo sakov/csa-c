@@ -1325,7 +1325,7 @@ void csa_approximatepoint(csa* a, point* p)
     double bc[3];
 
     if (a->squares == NULL)
-	quit("csa_approximatepoint(): csa_calculatespline() had to be called\n");
+        quit("csa_approximatepoint(): csa_calculatespline() had to be called\n");
 
     if (fabs(rint(ii) - ii) / h < EPS)
         ii = rint(ii);
@@ -1441,35 +1441,35 @@ double* csa_approximatepoints2(int nin, double xin[], double yin[], double zin[]
     int ii;
 
     if (nin <= 0 || nout <= 0)
-	return zout;
-    
+        return zout;
+
     /*
      * create approximator
      */
     a = csa_create();
     if (npmin > 0)
-	csa_setnpmin(a, npmin);
+        csa_setnpmin(a, npmin);
     if (npmax > 0 && npmax > npmin)
-	csa_setnpmax(a, npmax);
+        csa_setnpmax(a, npmax);
     if (k > 0.0)
-	csa_setk(a, k);
+        csa_setk(a, k);
     if (nppc > 0)
-	csa_setnppc(a, nppc);
+        csa_setnppc(a, nppc);
 
     /*
      * read input data into point array
      */
     pin = malloc(sizeof(point) * nin);
     for (ii = 0; ii < nin; ++ii) {
-	point* p = &pin[ii];
+        point* p = &pin[ii];
 
-	p->x = xin[ii];
-	p->y = yin[ii];
-	p->z = zin[ii];
+        p->x = xin[ii];
+        p->y = yin[ii];
+        p->z = zin[ii];
     }
     csa_addpoints(a, nin, pin);
     if (sigma != NULL)
-	csa_addstd(a, nin, sigma);
+        csa_addstd(a, nin, sigma);
 
     /*
      * calculate spline
@@ -1481,11 +1481,11 @@ double* csa_approximatepoints2(int nin, double xin[], double yin[], double zin[]
      */
     pout = malloc(sizeof(point) * nout);
     for (ii = 0; ii < nout; ++ii) {
-	point* p = &pout[ii];
+        point* p = &pout[ii];
 
-	p->x = xout[ii];
-	p->y = yout[ii];
-	p->z = NaN;
+        p->x = xout[ii];
+        p->y = yout[ii];
+        p->z = NaN;
     }
 
     /*
@@ -1498,7 +1498,7 @@ double* csa_approximatepoints2(int nin, double xin[], double yin[], double zin[]
      */
     zout = malloc(nout * sizeof(double));
     for (ii = 0; ii < nout; ++ii)
-	zout[ii] = pout[ii].z;
+        zout[ii] = pout[ii].z;
 
     /*
      * clean up
