@@ -1,3 +1,6 @@
+v. 1.21, 1 Feb 2011
+        -- A small chamge in makefile.in: "make distclean" now cleans the 
+           examples as well
 v. 1.20, 26 May 2009
         -- Bug fix in csa_approximatepoints2().
 v. 1.19, 25 May 2009
