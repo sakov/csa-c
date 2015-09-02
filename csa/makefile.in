@@ -63,7 +63,15 @@ svd_test
 
 LIBOBJS = ${LIBSRC:.c=.o}
 
-all: libcsa.a $(PROGRAMS)
+SHLIBOBJS = ${LIBSRC:.c=.t}
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -I. -c $*.c -o $*.o
+
+%.t: %.c
+	$(CC) $(CFLAGS) -fPIC $(CPPFLAGS) -I. -c $*.c -o $*.t
+
+all: libcsa.a libcsa.so $(PROGRAMS)
 
 csabathy: $(SRC)
 	$(CC) -o csabathy $(CFLAGS) -DCSA_STANDALONE -I. $(SRC) $(LDFLAGS) $(MLIB)
@@ -75,6 +83,10 @@ standalone: $(PROGRAMS)
 libcsa.a: $(LIBOBJS)
 	$(AR) $(ARFLAGS) libcsa.a $(LIBOBJS)
 	chmod go+r libcsa.a
+
+libcsa.so: $(SHLIBOBJS)
+	rm -f $@
+	$(CC) -shared -o $@ $(SHLIBOBJS)
 
 tests: $(TESTS)
 
@@ -91,7 +103,7 @@ installdirs:
 	$(SHELL) mkinstalldirs $(INSTALLDIRS)
 
 install: all installdirs
-	for i in libcsa.a; do \
+	for i in libcsa.a libcsa.so; do \
 	   $(INSTALL_DATA) $$i $(libdir)/$$i; \
 	done
 
@@ -123,35 +135,3 @@ distclean: clean configclean ex1clean ex2clean ex3clean
 indent:
 	indent -T FILE -T point -T csa -T square -T triangle -T minell $(SRC) $(HEADERS)
 	rm -f *~
-
-dist:
-	WDIR=`pwd`;\
-	DIR=`basename $$WDIR`;\
-	cp -r $$WDIR /tmp;\
-	cd /tmp/$$DIR/examples/1;\
-	make clean;\
-	rm -f example.pdf;\
-	cd /tmp/$$DIR/examples/2;\
-	make clean;\
-	rm -f example.pdf;\
-	cd /tmp/$$DIR/examples/3;\
-	make clean;\
-	rm -f example.pdf;\
-	cd /tmp/$$DIR;\
-	rm -rf `find /tmp/$$DIR -name CVS`;\
-	if [ -e makefile ] ; then\
-		make distclean;\
-	fi;\
-	/tmp/"$$DIR"/configure;\
-	make standalone;\
-	chmod a+r+x $(PROGRAMS);\
-	mv -f $(PROGRAMS) $(DISTDIR);\
-	make distclean;\
-	cd $(DISTDIR);\
-	mv -f $$DIR".tar.gz" $$DIR".tar.gz.prev";\
-	gzip -f $(PROGRAMS);\
-	cd /tmp;\
-	tar czvf $$DIR".tar.gz" $$DIR;\
-	chmod a+r $$DIR".tar.gz";\
-	mv -f $$DIR".tar.gz" $(DISTDIR)/$$DIR".tar.gz";\
-	rm -rf $$DIR
