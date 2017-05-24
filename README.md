@@ -1,4 +1,4 @@
-##csa
+## csa ##
 (Cubic Spline Approximation)
 
 **csa** is a C code for cubic spline approximation of 2D scattered data. It provides a C library and a command line utility **csabathy**.
