@@ -153,45 +153,38 @@ static void quit(char* format, ...)
     exit(1);
 }
 
-/* Allocates n1xn2 matrix of something. Note that it will be accessed as 
- * [n2][n1].
- * @param n1 Number of columns
- * @param n2 Number of rows
+/** Allocates ni x nj matrix of something and fills it with zeros. An element
+ * (i,j) will be accessed as [j][i]. For deallocation use free().
+ *
+ * @param nj Dimension 2
+ * @param ni Dimension 1
+ * @param unitsize Size of one matrix element in bytes
  * @return Matrix
  */
-static void* alloc2d(int n1, int n2, size_t unitsize)
+static void* alloc2d(size_t nj, size_t ni, size_t unitsize)
 {
-    unsigned int size;
-    char* p;
-    char** pp;
+    size_t size;
+    void* p;
+    void** pp;
     int i;
 
-    if (n1 <= 0 || n2 <= 0)
-        quit("alloc2d(): invalid size (n1 = %d, n2 = %d)\n", n1, n2);
+    if (ni <= 0 || nj <= 0)
+        quit("alloc2d(): invalid size (nj = %d, ni = %d)", nj, ni);
 
-    size = n1 * n2;
-    if ((p = calloc(size, unitsize)) == NULL)
-        quit("alloc2d(): %s\n", strerror(errno));
+    size = nj * sizeof(void*) + nj * ni * unitsize;
+    if ((p = malloc(size)) == NULL) {
+        int errno_saved = errno;
 
-    size = n2 * sizeof(void*);
-    if ((pp = malloc(size)) == NULL)
-        quit("alloc2d(): %s\n", strerror(errno));
-    for (i = 0; i < n2; i++)
-        pp[i] = &p[i * n1 * unitsize];
+        quit("alloc2d(): %s", strerror(errno_saved));
+    }
+    memset(p, 0, size);
+
+    pp = p;
+    p = &((size_t*) p)[nj];
+    for (i = 0; i < nj; i++)
+        pp[i] = &((char*) p)[i * ni * unitsize];
 
     return pp;
-}
-
-/* Destroys a matrix.
- * @param pp Matrix
- */
-static void free2d(void* pp)
-{
-    void* p;
-
-    p = ((void**) pp)[0];
-    free(pp);
-    free(p);
 }
 
 /*
@@ -398,7 +391,7 @@ void csa_destroy(csa* a)
         for (j = 0; j < a->nj; ++j)
             for (i = 0; i < a->ni; ++i)
                 square_destroy(a->squares[j][i]);
-        free2d(a->squares);
+        free(a->squares);
     }
     if (a->pt != NULL)
         free(a->pt);
@@ -546,7 +539,7 @@ static void csa_squarize(csa* a)
     /*
      * create squares 
      */
-    a->squares = alloc2d(a->ni, a->nj, sizeof(void*));
+    a->squares = alloc2d(a->nj, a->ni, sizeof(void*));
     for (j = 0; j < a->nj; ++j)
         for (i = 0; i < a->ni; ++i)
             a->squares[j][i] = square_create(a, a->xmin + h * (i - 1), a->ymin + h * (j - 1), i, j);
@@ -750,7 +743,7 @@ static void thindata(triangle* t, int npmax)
         }
     }
 
-    free2d(squares);
+    free(squares);
     imax++;
 }
 
@@ -876,7 +869,7 @@ static void csa_findprimarycoeffstriangle(csa* a, triangle* t)
         assert(q >= 0);
 
         if (q == 3) {
-            double** A = alloc2d(10, npoints, sizeof(double));
+            double** A = alloc2d(npoints, 10, sizeof(double));
             double w[10];
 
             for (ii = 0; ii < npoints; ++ii) {
@@ -920,10 +913,10 @@ static void csa_findprimarycoeffstriangle(csa* a, triangle* t)
             if (wmin < wmax / a->k)
                 ok = 0;
 
-            free2d(A);
+            free(A);
 
         } else if (q == 2) {
-            double** A = alloc2d(6, npoints, sizeof(double));
+            double** A = alloc2d(npoints, 6, sizeof(double));
             double w[6];
 
             for (ii = 0; ii < npoints; ++ii) {
@@ -970,10 +963,10 @@ static void csa_findprimarycoeffstriangle(csa* a, triangle* t)
                 b[9] = b1[5];
             }
 
-            free2d(A);
+            free(A);
 
         } else if (q == 1) {
-            double** A = alloc2d(3, npoints, sizeof(double));
+            double** A = alloc2d(npoints, 3, sizeof(double));
             double w[3];
 
             for (ii = 0; ii < npoints; ++ii) {
@@ -1012,9 +1005,9 @@ static void csa_findprimarycoeffstriangle(csa* a, triangle* t)
                 b[9] = b1[2];
             }
 
-            free2d(A);
+            free(A);
         } else if (q == 0) {
-            double** A = alloc2d(1, npoints, sizeof(double));
+            double** A = alloc2d(npoints, 1, sizeof(double));
             double w[1];
 
             for (ii = 0; ii < npoints; ++ii)
@@ -1034,7 +1027,7 @@ static void csa_findprimarycoeffstriangle(csa* a, triangle* t)
             b[8] = b1[0];
             b[9] = b1[0];
 
-            free2d(A);
+            free(A);
         }
     } while (!ok);
 

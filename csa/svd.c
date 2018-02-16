@@ -91,45 +91,38 @@ static void quit(char* format, ...)
     exit(1);
 }
 
-/* Allocates n1xn2 matrix of something. Note that it will be accessed as 
- * [n2][n1].
- * @param n1 Number of columns
- * @param n2 Number of rows
+/** Allocates ni x nj matrix of something and fills it with zeros. An element
+ * (i,j) will be accessed as [j][i]. For deallocation use free().
+ *
+ * @param nj Dimension 2
+ * @param ni Dimension 1
+ * @param unitsize Size of one matrix element in bytes
  * @return Matrix
  */
-static void* alloc2d(int n1, int n2, size_t unitsize)
+static void* alloc2d(size_t nj, size_t ni, size_t unitsize)
 {
     size_t size;
-    char* p;
-    char** pp;
+    void* p;
+    void** pp;
     int i;
 
-    if (n1 <= 0 || n2 <= 0)
-        quit("alloc2d(): invalid size (n1 = %d, n2 = %d)\n", n1, n2);
+    if (ni <= 0 || nj <= 0)
+        quit("alloc2d(): invalid size (nj = %d, ni = %d)", nj, ni);
 
-    size = n1 * n2;
-    if ((p = calloc(size, unitsize)) == NULL)
-        quit("alloc2d(): %s\n", strerror(errno));
+    size = nj * sizeof(void*) + nj * ni * unitsize;
+    if ((p = malloc(size)) == NULL) {
+        int errno_saved = errno;
 
-    size = n2 * sizeof(void*);
-    if ((pp = malloc(size)) == NULL)
-        quit("alloc2d(): %s\n", strerror(errno));
-    for (i = 0; i < n2; i++)
-        pp[i] = &p[i * n1 * unitsize];
+        quit("alloc2d(): %s", strerror(errno_saved));
+    }
+    memset(p, 0, size);
+
+    pp = p;
+    p = &((size_t*) p)[nj];
+    for (i = 0; i < nj; i++)
+        pp[i] = &((char*) p)[i * ni * unitsize];
 
     return pp;
-}
-
-/* Destroys a matrix.
- * @param pp Matrix
- */
-static void free2d(void* pp)
-{
-    void* p;
-
-    p = ((void**) pp)[0];
-    free(pp);
-    free(p);
 }
 
 /** Performs singular value decomposition for a dense matrix.
@@ -482,7 +475,7 @@ void svd_sort(double** A, int n, int m, double* w, double** V)
 {
     int* pos = malloc(n * sizeof(int));
     double* wold = malloc(n * sizeof(double));
-    double** aold = alloc2d(n, m, sizeof(double));
+    double** aold = alloc2d(m, n, sizeof(double));
     double** vold = alloc2d(n, n, sizeof(double));
     double wmax;
     int i, j;
@@ -514,8 +507,8 @@ void svd_sort(double** A, int n, int m, double* w, double** V)
 
     free(pos);
     free(wold);
-    free2d(aold);
-    free2d(vold);
+    free(aold);
+    free(vold);
 
     if (svd_verbose) {
         fprintf(stderr, "\n");
@@ -575,7 +568,7 @@ void svd_sort(double** A, int n, int m, double* w, double** V)
  */
 void svd_lsq(double** A, int ni, int nj, double* z, double* std, double* w, double* sol)
 {
-    double** V = alloc2d(ni, ni + nj, sizeof(double));  /* V and B at once */
+    double** V = alloc2d(ni + nj, ni, sizeof(double));  /* V and B at once */
     double** B = &V[ni];
     int nijmin = (ni < nj) ? ni : nj;
     int i, j, ii;
@@ -631,7 +624,7 @@ void svd_lsq(double** A, int ni, int nj, double* z, double* std, double* w, doub
         for (j = 0; j < nj; ++j)
             z[j] *= std[j];
 
-    free2d(V);
+    free(V);
 }
 
 #if defined(SVD_TEST)
@@ -681,7 +674,7 @@ int main(int argc, char* argv[])
     if (argc != m * n + 3)
         usage();
 
-    A = alloc2d(n, m, sizeof(double));
+    A = alloc2d(m, n, sizeof(double));
 
     for (j = 0, k = 3; j < m; ++j)
         for (i = 0; i < n; ++i, ++k)
@@ -692,7 +685,7 @@ int main(int argc, char* argv[])
 
     V = alloc2d(n, n, sizeof(double));
     w = malloc(mnmax * sizeof(double));
-    W = alloc2d(n, mnmax, sizeof(double));
+    W = alloc2d(mnmax, n, sizeof(double));
 
     printf("performing SVD:");
 
@@ -726,10 +719,10 @@ int main(int argc, char* argv[])
     printf("V =\n");
     matrix_print(mnmin, n, V, "  ");
 
-    free2d(A);
+    free(A);
     free(w);
-    free2d(V);
-    free2d(W);
+    free(V);
+    free(W);
 
     return 0;
 }
@@ -813,7 +806,7 @@ int main(int argc, char* argv[])
     if (argc != m * (n + 1) + 3 && argc != m * (n + 2) + 3)
         usage();
 
-    A = alloc2d(n, m, sizeof(double));
+    A = alloc2d(m, n, sizeof(double));
 
     for (j = 0, k = 3; j < m; ++j)
         for (i = 0; i < n; ++i, ++k)
@@ -848,7 +841,7 @@ int main(int argc, char* argv[])
     printf("solution = \n");
     column_print(n, sol, "  ");
 
-    free2d(A);
+    free(A);
     free(b);
     if (std != NULL)
         free(std);

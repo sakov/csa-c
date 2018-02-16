@@ -1,7 +1,9 @@
+v. 1.23, 17 February 2018
+        -- Modified alloc2d() to a more advanced version. Eliminated free2d().
 v. 1.22, 1 May 2012
         -- A change in nan.h to distinguish between gcc and icc
 v. 1.21, 1 Feb 2011
-        -- A small chamge in makefile.in: "make distclean" now cleans the 
+        -- A small chamge in makefile.in: "make distclean" now cleans the
            examples as well
 v. 1.20, 26 May 2009
         -- Bug fix in csa_approximatepoints2().
@@ -14,12 +16,12 @@ v. 1.17, 19 October 2007
    	-- Introduced this file
 	-- Corrected the advice in the help message:
 
-	   -P nppc=<value> -- set the average number of points per cell 
+	   -P nppc=<value> -- set the average number of points per cell
 	   (default = 5, increase if the point distribution is strongly
 	   non-uniform to get larger cells)
 
 	   became:
 
-	   -P nppc=<value> -- set the average number of points per cell 
-	   (default = 5, works best for uniformly distributed data. Decrease 
+	   -P nppc=<value> -- set the average number of points per cell
+	   (default = 5, works best for uniformly distributed data. Decrease
            to get smaller cells or increase to get larger cells)
