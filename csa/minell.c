@@ -1002,11 +1002,14 @@ static void minell_quit(char* format, ...)
 {
     va_list args;
 
-    fflush(stdout);
-    fprintf(stderr, "error: minimal ellipse: ");
+    fflush(stdout);             /* just in case -- to have the exit message
+                                 * last */
+
+    fprintf(stderr, "\n\n  error: minimal ellipse: ");
     va_start(args, format);
     vfprintf(stderr, format, args);
     va_end(args);
+    fprintf(stderr, "\n\n");
 
     exit(1);
 }
@@ -1081,7 +1084,7 @@ static void parse_commandline(int argc, char* argv[], char** fname)
             case 's':
                 i++;
                 if (i >= argc)
-                    minell_quit("could not read random seed after \"-s\"\n");
+                    minell_quit("could not read random seed after \"-s\"");
                 me_seed = atoi(argv[i]);
                 userandomseed = 0;
                 i++;
@@ -1160,7 +1163,7 @@ static void points_read(char* fname, int dim, int* n, point** points)
         else {
             f = fopen(fname, "r");
             if (f == NULL)
-                minell_quit("%s: %s\n", fname, strerror(errno));
+                minell_quit("%s: %s", fname, strerror(errno));
         }
     }
 
@@ -1205,7 +1208,7 @@ static void points_read(char* fname, int dim, int* n, point** points)
 
     if (f != stdin)
         if (fclose(f) != 0)
-            minell_quit("%s: %s\n", fname, strerror(errno));
+            minell_quit("%s: %s", fname, strerror(errno));
 }
 
 int main(int argc, char* argv[])

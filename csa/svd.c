@@ -83,16 +83,17 @@ static void quit(char* format, ...)
     fflush(stdout);             /* just in case -- to have the exit message
                                  * last */
 
-    fprintf(stderr, "\nerror: svd: ");
+    fprintf(stderr, "\n\n  error: csa: ");
     va_start(args, format);
     vfprintf(stderr, format, args);
     va_end(args);
+    fprintf(stderr, "\n\n");
 
     exit(1);
 }
 
 /** Allocates ni x nj matrix of something and fills it with zeros. An element
- * (i,j) will be accessed as [j][i]. For deallocation use free().
+ ** (i,j) will be accessed as [j][i]. For deallocation use free().
  *
  * @param nj Dimension 2
  * @param ni Dimension 1
@@ -119,7 +120,7 @@ static void* alloc2d(size_t nj, size_t ni, size_t unitsize)
 
     pp = p;
     p = &((size_t*) p)[nj];
-    for (i = 0; i < nj; i++)
+    for (i = 0; i < nj; ++i)
         pp[i] = &((char*) p)[i * ni * unitsize];
 
     return pp;
@@ -331,7 +332,7 @@ void svd(double** A, int n, int m, double* w, double** V)
 
             its++;
             if (its > SVD_NMAX)
-                quit("svd(): no convergence in %d iterations\n", SVD_NMAX);
+                quit("svd(): no convergence in %d iterations", SVD_NMAX);
 
             for (l = k; l >= 0; l--) {  /* test for splitting */
                 double tst2 = fabs(rv1[l]) + tst1;
@@ -667,9 +668,9 @@ int main(int argc, char* argv[])
     mnmax = (n > m) ? n : m;
 
     if (n <= 0)
-        quit("n = %d; expected n > 0\n", n);
+        quit("n = %d; expected n > 0", n);
     if (m <= 0)
-        quit("m = %d; expected m > 0\n", m);
+        quit("m = %d; expected m > 0", m);
 
     if (argc != m * n + 3)
         usage();
@@ -791,7 +792,6 @@ int main(int argc, char* argv[])
     double** A = NULL;
     double* b = NULL;
     double* std = NULL;
-    double** V = NULL;
     double* w = NULL;
     double* sol = NULL;
     int i, j, k;
@@ -830,7 +830,6 @@ int main(int argc, char* argv[])
     printf("std = \n");
     column_print(m, std, "  ");
 
-    V = alloc2d(n, n, sizeof(double));
     w = malloc(mnmax * sizeof(double));
     sol = malloc(n * sizeof(double));
 

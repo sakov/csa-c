@@ -1,3 +1,5 @@
+v. 1.24, 17 February 2018
+        -- A few cosmetic changes
 v. 1.23, 17 February 2018
         -- Modified alloc2d() to a more advanced version. Eliminated free2d().
 v. 1.22, 1 May 2012

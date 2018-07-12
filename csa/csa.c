@@ -145,16 +145,17 @@ static void quit(char* format, ...)
     fflush(stdout);             /* just in case -- to have the exit message
                                  * last */
 
-    fprintf(stderr, "\nerror: csa: ");
+    fprintf(stderr, "\n\n  error: csa: ");
     va_start(args, format);
     vfprintf(stderr, format, args);
     va_end(args);
+    fprintf(stderr, "\n\n");
 
     exit(1);
 }
 
 /** Allocates ni x nj matrix of something and fills it with zeros. An element
- * (i,j) will be accessed as [j][i]. For deallocation use free().
+ ** (i,j) will be accessed as [j][i]. For deallocation use free().
  *
  * @param nj Dimension 2
  * @param ni Dimension 1
@@ -181,7 +182,7 @@ static void* alloc2d(size_t nj, size_t ni, size_t unitsize)
 
     pp = p;
     p = &((size_t*) p)[nj];
-    for (i = 0; i < nj; i++)
+    for (i = 0; i < nj; ++i)
         pp[i] = &((char*) p)[i * ni * unitsize];
 
     return pp;
@@ -509,7 +510,7 @@ static void csa_squarize(csa* a)
     int i, j, ii, nadj;
 
     if (csa_verbose) {
-        fprintf(stderr, "squarizing:\n");
+        fprintf(stderr, "  squarizing:\n");
         fflush(stderr);
     }
 
@@ -532,7 +533,7 @@ static void csa_squarize(csa* a)
     a->nj = (int) ceil(dy / h) + 2;
 
     if (csa_verbose) {
-        fprintf(stderr, "  %d x %d squares\n", a->ni, a->nj);
+        fprintf(stderr, "    %d x %d squares\n", a->ni, a->nj);
         fflush(stderr);
     }
 
@@ -589,16 +590,16 @@ static void csa_squarize(csa* a)
     assert(a->npt > 0);
 
     if (csa_verbose) {
-        fprintf(stderr, "  %d non-empty squares\n", ii);
-        fprintf(stderr, "  %d primary squares\n", a->npt);
-        fprintf(stderr, "  %d primary squares with no data\n", nadj);
-        fprintf(stderr, "  %.2f points per square \n", (double) a->npoints / ii);
+        fprintf(stderr, "    %d non-empty squares\n", ii);
+        fprintf(stderr, "    %d primary squares\n", a->npt);
+        fprintf(stderr, "    %d primary squares with no data\n", nadj);
+        fprintf(stderr, "    %.2f points per square \n", (double) a->npoints / ii);
     }
 
     if (csa_verbose == 2) {
         for (i = 0; i < 6; ++i)
-            fprintf(stderr, "  %d-%d points -- %d squares\n", i * 5, i * 5 + 4, nps[i]);
-        fprintf(stderr, "  %d or more points -- %d squares\n", i * 5, nps[i]);
+            fprintf(stderr, "    %d-%d points -- %d squares\n", i * 5, i * 5 + 4, nps[i]);
+        fprintf(stderr, "    %d or more points -- %d squares\n", i * 5, nps[i]);
     }
 
     if (csa_verbose == 2) {
@@ -754,7 +755,7 @@ static void csa_attachpointstriangle(csa* a, triangle* t)
 {
     int increased = 0;
 
-    if (csa_verbose) {
+    if (csa_verbose > 1) {
         fprintf(stderr, ".");
         fflush(stderr);
     }
@@ -845,7 +846,7 @@ static void csa_findprimarycoeffstriangle(csa* a, triangle* t)
     double b1[6];
     int ii;
 
-    if (csa_verbose) {
+    if (csa_verbose > 1) {
         fprintf(stderr, ".");
         fflush(stderr);
     }
@@ -1074,7 +1075,7 @@ static void csa_findprimarycoeffs(csa* a)
     int i;
 
     if (csa_verbose)
-        fprintf(stderr, "calculating spline coefficients for primary triangles:\n  ");
+        fprintf(stderr, "  calculating spline coefficients for primary triangles:\n  ");
 
     for (i = 0; i < a->npt; ++i) {
         triangle* t = a->pt[i];
@@ -1084,10 +1085,10 @@ static void csa_findprimarycoeffs(csa* a)
     }
 
     if (csa_verbose) {
-        fprintf(stderr, "\n  3rd order -- %d sets\n", a->norder[3]);
-        fprintf(stderr, "  2nd order -- %d sets\n", a->norder[2]);
-        fprintf(stderr, "  1st order -- %d sets\n", a->norder[1]);
-        fprintf(stderr, "  0th order -- %d sets\n", a->norder[0]);
+        fprintf(stderr, "\n    3rd order -- %d sets\n", a->norder[3]);
+        fprintf(stderr, "    2nd order -- %d sets\n", a->norder[2]);
+        fprintf(stderr, "    1st order -- %d sets\n", a->norder[1]);
+        fprintf(stderr, "    0th order -- %d sets\n", a->norder[0]);
         fflush(stderr);
     }
 
@@ -1124,7 +1125,7 @@ static void csa_findsecondarycoeffs(csa* a)
     int ii;
 
     if (csa_verbose) {
-        fprintf(stderr, "propagating spline coefficients to the remaining triangles:\n");
+        fprintf(stderr, "  propagating spline coefficients to the remaining triangles:\n");
         fflush(stderr);
     }
 
@@ -1243,7 +1244,7 @@ static void csa_findsecondarycoeffs(csa* a)
     }
 
     if (csa_verbose) {
-        fprintf(stderr, "checking that all coefficients have been set:\n");
+        fprintf(stderr, "  checking that all coefficients have been set:\n");
         fflush(stderr);
     }
 
@@ -1256,7 +1257,7 @@ static void csa_findsecondarycoeffs(csa* a)
             continue;
         for (i = 0; i < 25; ++i)
             if (isnan(c[i]))
-                fprintf(stderr, "  squares[%d][%d]->coeffs[%d] = NaN\n", s->j, s->i, i);
+                fprintf(stderr, "    squares[%d][%d]->coeffs[%d] = NaN\n", s->j, s->i, i);
     }
 }
 
@@ -1318,7 +1319,7 @@ void csa_approximatepoint(csa* a, point* p)
     double bc[3];
 
     if (a->squares == NULL)
-        quit("csa_approximatepoint(): csa_calculatespline() had to be called\n");
+        quit("csa_approximatepoint(): csa_calculatespline() had to be called");
 
     if (fabs(rint(ii) - ii) / h < EPS)
         ii = rint(ii);
@@ -1598,7 +1599,7 @@ static void points_read(char* fname, int dim, int* n, point** points, double** s
         else {
             f = fopen(fname, "r");
             if (f == NULL)
-                quit("%s: %s\n", fname, strerror(errno));
+                quit("%s: %s", fname, strerror(errno));
         }
     }
 
@@ -1646,14 +1647,14 @@ static void points_read(char* fname, int dim, int* n, point** points, double** s
                 if ((token = strtok(NULL, seps)) != NULL)
                     *std = malloc(nallocated * sizeof(double));
                 if (csa_verbose)
-                    fprintf(stderr, "%s std data\n", (token != NULL) ? "found" : "no");
+                    fprintf(stderr, "  %s stdin data\n", (token != NULL) ? "found" : "no");
             }
 
             if (*std != NULL) {
                 if (*n != 0)
                     token = strtok(NULL, seps);
                 if (token != NULL && !str2double(token, &stdval))
-                    quit("%s: could not convert \"%s\" to std\n", fname, token);
+                    quit("  %s: could not convert \"%s\" to double", fname, token);
                 (*std)[*n] = stdval;
             }
         }
@@ -1670,15 +1671,12 @@ static void points_read(char* fname, int dim, int* n, point** points, double** s
 
     if (f != stdin)
         if (fclose(f) != 0)
-            quit("%s: %s\n", fname, strerror(errno));
+            quit("%s: %s", fname, strerror(errno));
 }
 
 static void points_write(int n, point* points)
 {
     int i;
-
-    if (csa_verbose)
-        printf("Output:\n");
 
     for (i = 0; i < n; ++i) {
         point* p = &points[i];
@@ -1792,7 +1790,7 @@ static void parse_commandline(int argc, char* argv[], char** fdata, char** fpoin
         case 'i':
             i++;
             if (i >= argc)
-                quit("no file name found after -i\n");
+                quit("no file name found after -i");
             *fdata = argv[i];
             i++;
             break;
@@ -1801,17 +1799,17 @@ static void parse_commandline(int argc, char* argv[], char** fdata, char** fpoin
             *fpoints = NULL;
             *generate_points = 1;
             if (i >= argc)
-                quit("no grid dimensions found after -n\n");
+                quit("no grid dimensions found after -n");
             if (sscanf(argv[i], "%dx%d", nx, ny) != 2)
-                quit("could not read grid dimensions after \"-n\"\n");
+                quit("could not read grid dimensions after \"-n\"");
             if (*nx <= 0 || *nx > NIMAX || *ny <= 0 || *ny > NIMAX)
-                quit("invalid size for output grid\n");
+                quit("invalid size for output grid");
             i++;
             break;
         case 'o':
             i++;
             if (i >= argc)
-                quit("no file name found after -o\n");
+                quit("no file name found after -o");
             *fpoints = argv[i];
             i++;
             break;
@@ -1828,7 +1826,7 @@ static void parse_commandline(int argc, char* argv[], char** fdata, char** fpoin
         case 'z':
             i++;
             if (i >= argc)
-                quit("no zoom value found after -z\n");
+                quit("no zoom value found after -z");
             *zoom = atof(argv[i]);
             i++;
             break;
@@ -1839,41 +1837,41 @@ static void parse_commandline(int argc, char* argv[], char** fdata, char** fpoin
 
                 i++;
                 if (i >= argc)
-                    quit("no input found after -P\n");
+                    quit("no input found after -P");
 
                 if (strlen(argv[i]) >= STRBUFSIZE)
-                    quit("could not interpret \"%s\" after -P option\n", argv[i]);
+                    quit("could not interpret \"%s\" after -P option", argv[i]);
 
                 strcpy(prmstr, argv[i]);
                 token = strtok(prmstr, delim);
                 if (token == NULL)
-                    quit("could not interpret \"%s\" after -P option\n", argv[i]);
+                    quit("could not interpret \"%s\" after -P option", argv[i]);
 
                 if (strcmp(token, "nppc") == 0) {
                     long int n;
 
                     token = strtok(NULL, delim);
                     if (token == NULL)
-                        quit("could not interpret \"%s\" after -P option\n", argv[i]);
+                        quit("could not interpret \"%s\" after -P option", argv[i]);
 
                     n = strtol(token, NULL, 10);
                     if (n == LONG_MIN || n == LONG_MAX)
-                        quit("could not interpret \"%s\" after -P option\n", argv[i]);
+                        quit("could not interpret \"%s\" after -P option", argv[i]);
                     else if (n <= 0)
-                        quit("non-sensible value for \"nppc\" parameter\n");
+                        quit("non-sensible value for \"nppc\" parameter");
                     *nppc = (int) n;
                 } else if (strcmp(token, "k") == 0) {
                     long int n;
 
                     token = strtok(NULL, delim);
                     if (token == NULL)
-                        quit("could not interpret \"%s\" after -P option\n", argv[i]);
+                        quit("could not interpret \"%s\" after -P option", argv[i]);
 
                     n = strtol(token, NULL, 10);
                     if (n == LONG_MIN || n == LONG_MAX)
-                        quit("could not interpret \"%s\" after -P option\n", argv[i]);
+                        quit("could not interpret \"%s\" after -P option", argv[i]);
                     else if (n <= 0)
-                        quit("non-sensible value for \"k\" parameter\n");
+                        quit("non-sensible value for \"k\" parameter");
                     *k = (int) n;
                 } else
                     usage();
@@ -1919,10 +1917,10 @@ int main(int argc, char* argv[])
     parse_commandline(argc, argv, &fdata, &fpoints, &invariant, &square, &generate_points, &nx, &ny, &nppc, &k, &zoom);
 
     if (fdata == NULL)
-        quit("no input data\n");
+        quit("no input data");
 
     if (!generate_points && fpoints == NULL)
-        quit("no output grid specified\n");
+        quit("no output grid specified");
 
     points_read(fdata, 3, &nin, &pin, &std);
 

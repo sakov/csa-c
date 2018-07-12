@@ -18,12 +18,12 @@ echo
 
 for N in 100 300 1000
 do 
-    echo "  N = $N:"
+    echo "  N = ${N}:"
     echo -n "    Generating..."
     echo "1" | awk -f ./generate.awk N=$N F=0.2 P=5 > data-F-${N}.txt
     echo "done"
     echo -n "    Approximating into 256x256 grid..."
-    ../../csabathy -i data-F-$N.txt -n 256x256 -P nppc=15 -P k=70 > out-F-${N}.txt
+    ../../csabathy -i data-F-${N}.txt -n 256x256 -P nppc=15 -P k=70 > out-F-${N}.txt
     echo "done"
 done
 
