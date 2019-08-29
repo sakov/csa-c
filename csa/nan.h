@@ -19,6 +19,16 @@
 #if !defined(_NAN_H)
 #define _NAN_H
 
+// Try to use the implementation-provided NAN constant:
+
+#include <math.h>
+
+#if defined(NAN)
+
+#define NaN ((double)NAN)
+
+#else // ^^^ implementation provides NAN // implementation does not provide NAN vvv
+
 #if defined(__GNUC__) && !defined(__INTEL_COMPILER)
 
 static const double NaN = 0.0 / 0.0;
@@ -36,5 +46,7 @@ static const long long lNaN = ((unsigned long long) 1 << 63) - 1;
 #define NaN (*(double*)&lNaN)
 
 #endif
+
+#endif // defined(NAN)
 
 #endif
