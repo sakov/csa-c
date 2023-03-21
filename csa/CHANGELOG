@@ -1,3 +1,7 @@
+v. 1.25, 22 March 2023
+        -- In csa.h and minell.h replaced "#if defined(_POINT_STRUCT)" by
+           "#if defined(_STRUCT_POINT)" to harmonise with current nn.h in nn-c.
+        -- A couple of cosmetic changes.
 v. 1.24, 17 February 2018
         -- A few cosmetic changes
 v. 1.23, 17 February 2018
