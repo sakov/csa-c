@@ -5,7 +5,7 @@
 
 **csa** uses a fast O(N) and robust algorithm that works nicely for uniformly distributed data. It is described in [this](http://dx.doi.org/10.1109/VISUAL.2001.964530) paper. For clustered data you may prefer Natural Neighbours interpolation.
 
-Checkout csa by running `git clone https://github.com/sakov/csa-c` or `svn checkout https://github.com/sakov/csa-c`.
+Checkout csa by running `git clone https://github.com/sakov/csa-c`.
 
 From the [original paper](http://dx.doi.org/10.1109/VISUAL.2001.964530):
 
