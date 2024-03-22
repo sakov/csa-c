@@ -1,3 +1,7 @@
+v. 1.26, 22 March 2024
+        -- Allow to proceed when there are valid tiles (just return NaNs). This
+           may be useful when interpolating layered models with some layers
+           empty.
 v. 1.25, 22 March 2023
         -- In csa.h and minell.h replaced "#if defined(_POINT_STRUCT)" by
            "#if defined(_STRUCT_POINT)" to harmonise with current nn.h in nn-c.

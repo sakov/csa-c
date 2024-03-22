@@ -1318,8 +1318,10 @@ void csa_approximatepoint(csa* a, point* p)
     int ti;
     double bc[3];
 
-    if (a->squares == NULL)
-        quit("csa_approximatepoint(): csa_calculatespline() had to be called");
+    if (a->squares == NULL) {
+        p->z = NaN;
+        return;
+    }
 
     if (fabs(rint(ii) - ii) / h < EPS)
         ii = rint(ii);
